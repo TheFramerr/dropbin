@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DropBin</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap"
+    rel="stylesheet">
+  <!-- QR Code generation for instant mobile pickup -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+</head>
+
+<body>
+  <div class="background-glow"></div>
+
+  <header class="app-header">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="17 8 12 3 7 8" />
+          <line x1="12" y1="3" x2="12" y2="15" />
+        </svg>
+      </div>
+      <div>
+        <h1>DropBin</h1>
+        <p class="tagline">File transfer using google scripting</p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <div id="statusIndicator" class="status-badge status-demo" title="Connection Status">
+        <span class="status-dot"></span>
+        <span id="statusText">Demo Mode</span>
+      </div>
+      <button id="openSettingsBtn" class="icon-btn" title="API Settings">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path
+            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+          </path>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <!-- Navigation Tabs -->
+    <div class="tabs-nav">
+      <button class="tab-btn active" data-tab="uploadTab">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="17 8 12 3 7 8" />
+          <line x1="12" y1="3" x2="12" y2="15" />
+        </svg>
+        Upload & Share
+      </button>
+      <button class="tab-btn" data-tab="retrieveTab">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="7 10 12 15 17 10" />
+          <line x1="12" y1="15" x2="12" y2="3" />
+        </svg>
+        Retrieve by Code
+      </button>
+    </div>
+
+    <!-- TAB 1: UPLOAD / SHARE -->
+    <section id="uploadTab" class="tab-pane active">
+      <div class="card">
+        <!-- Sub-selector: File vs Text -->
+        <div class="submode-selector">
+          <button class="submode-btn active" id="modeFileBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+            Upload File
+          </button>
+          <button class="submode-btn" id="modeTextBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="4" y1="9" x2="20" y2="9"></line>
+              <line x1="4" y1="15" x2="20" y2="15"></line>
+              <line x1="10" y1="3" x2="8" y2="21"></line>
+              <line x1="16" y1="3" x2="14" y2="21"></line>
+            </svg>
+            Keyboard Text / Code
+          </button>
+        </div>
+
+        <!-- File Upload Area -->
+        <div id="fileArea" class="upload-area">
+          <div class="dropzone" id="dropzone">
+            <input type="file" id="fileInput" class="file-hidden-input">
+            <div class="dropzone-content">
+              <div class="dropzone-icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path>
+                  <path d="M12 12v9"></path>
+                  <path d="m16 16-4-4-4 4"></path>
+                </svg>
+              </div>
+              <h3>Drag & drop your file here</h3>
+              <p>or <span class="browse-link">browse files</span> from your device</p>
+              <span class="file-limits">Any format up to 25MB • Stored in your Google Drive</span>
+            </div>
+          </div>
+
+          <!-- Selected File Preview -->
+          <div id="selectedFileCard" class="selected-file-card hidden">
+            <div class="file-details">
+              <div class="file-type-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+                  <polyline points="13 2 13 9 20 9"></polyline>
+                </svg>
+              </div>
+              <div class="file-meta">
+                <span id="selectedFileName" class="file-name">filename.ext</span>
+                <span id="selectedFileSize" class="file-size">0 KB</span>
+              </div>
+            </div>
+            <button id="removeFileBtn" class="icon-btn-danger" title="Remove file">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Text Input Area -->
+        <div id="textArea" class="upload-area hidden">
+          <div class="form-group">
+            <div class="input-header-row">
+              <label for="textTitleInput">Snippet Title / Filename (Optional)</label>
+              <button id="pasteClipboardBtn" class="btn-text">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                  <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                </svg>
+                Paste from Clipboard
+              </button>
+            </div>
+            <input type="text" id="textTitleInput" placeholder="e.g. notes.txt, my-config.json, api-key.txt">
+          </div>
+          <div class="form-group">
+            <textarea id="textPayloadInput" rows="9"
+              placeholder="Type or paste your text, code snippet, notes, or credentials here..."></textarea>
+            <div class="char-count"><span id="charCount">0</span> characters</div>
+          </div>
+        </div>
+
+        <!-- Optional Custom Code & Controls -->
+        <div class="options-row">
+          <div class="custom-code-box">
+            <label for="customCodeInput">Custom Code (Optional)</label>
+            <input type="text" id="customCodeInput" maxlength="8" placeholder="Auto-generated if empty">
+            <small>Leave empty to generate a random 6-character code</small>
+          </div>
+        </div>
+
+        <button id="submitUploadBtn" class="btn-primary">
+          <span class="btn-text-content">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14"></path>
+              <path d="m12 5 7 7-7 7"></path>
+            </svg>
+            Upload & Generate Code
+          </span>
+          <span class="btn-spinner hidden"></span>
+        </button>
+
+        <!-- Upload Success Result Box -->
+        <div id="uploadSuccessCard" class="result-card hidden">
+          <div class="success-header">
+            <div class="check-icon">✓</div>
+            <h3>Uploaded Successfully!</h3>
+            <p>Share this code or link with anyone to let them download this item.</p>
+          </div>
+
+          <div class="code-display-box">
+            <span class="code-label">RETRIEVAL CODE</span>
+            <div class="code-value-row">
+              <span id="generatedCodeDisplay" class="code-value">------</span>
+              <button id="copyCodeBtn" class="btn-secondary" title="Copy code">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                Copy Code
+              </button>
+            </div>
+          </div>
+
+          <div class="share-link-box">
+            <label>Direct Retrieval URL</label>
+            <div class="link-input-group">
+              <input type="text" id="shareUrlInput" readonly>
+              <button id="copyLinkBtn" class="btn-secondary">Copy Link</button>
+            </div>
+          </div>
+
+          <div class="qr-container">
+            <canvas id="qrCanvas"></canvas>
+            <p>Scan with mobile camera for instant download</p>
+          </div>
+
+          <button id="resetUploadBtn" class="btn-outline">Upload Another Item</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: RETRIEVE -->
+    <section id="retrieveTab" class="tab-pane">
+      <div class="card">
+        <div class="retrieve-input-section">
+          <h2>Enter Retrieval Code</h2>
+          <p>Enter the 4-to-8 character code provided by the uploader to fetch your file or text.</p>
+
+          <form id="retrieveForm" class="code-input-form" onsubmit="return false;">
+            <div class="code-field-wrapper">
+              <input type="text" id="retrieveCodeInput" maxlength="8" placeholder="e.g. A9X2B4" autocomplete="off"
+                spellcheck="false" autofocus>
+              <button type="submit" id="submitRetrieveBtn" class="btn-primary">
+                <span class="btn-text-content">Fetch Item</span>
+                <span class="btn-spinner hidden"></span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Retrieved Result Container -->
+        <div id="retrieveResultCard" class="result-card hidden">
+          <div class="item-header">
+            <div class="item-type-badge" id="retrievedTypeBadge">FILE</div>
+            <h3 id="retrievedTitle">Filename.ext</h3>
+            <span id="retrievedMeta" class="meta-tag">Size: 120 KB • Date: 2026-10-02</span>
+          </div>
+
+          <!-- File Download Block -->
+          <div id="fileResultBlock" class="result-block">
+            <div class="download-action-box">
+              <div class="file-icon-large">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="12" y1="18" x2="12" y2="12"></line>
+                  <line x1="9" y1="15" x2="15" y2="15"></line>
+                </svg>
+              </div>
+              <div class="download-actions">
+                <button id="downloadFileBtn" class="btn-primary btn-large">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  Download File
+                </button>
+                <a id="driveBackupLink" class="backup-link hidden" target="_blank" rel="noopener">Open in Google Drive
+                  ↗</a>
+              </div>
+            </div>
+            <!-- Optional Image Preview -->
+            <div id="imagePreviewContainer" class="image-preview-container hidden">
+              <img id="imagePreview" alt="File Preview">
+            </div>
+          </div>
+
+          <!-- Text Preview Block -->
+          <div id="textResultBlock" class="result-block hidden">
+            <div class="text-actions-bar">
+              <span class="preview-label">Text Content</span>
+              <div class="text-action-buttons">
+                <button id="copyRetrievedTextBtn" class="btn-secondary btn-sm">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                  </svg>
+                  Copy Text
+                </button>
+                <button id="downloadTextAsFileBtn" class="btn-secondary btn-sm">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  Download as .txt
+                </button>
+              </div>
+            </div>
+            <pre id="retrievedTextDisplay" class="code-view"></pre>
+          </div>
+        </div>
+
+        <!-- Error Alert -->
+        <div id="retrieveErrorAlert" class="error-alert hidden">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <span id="retrieveErrorMsg">No item found matching this code.</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Google Apps Script Settings Modal -->
+  <div id="settingsModal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Google Drive Backend Settings</h3>
+        <button id="closeSettingsBtn" class="icon-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">
+          Because GitHub Pages cannot run servers, we use a <strong>free Google Apps Script</strong> deployed directly
+          on your Google Drive as your serverless API endpoint.
+        </p>
+
+        <div class="form-group">
+          <label for="gasUrlInput">Google Apps Script Web App URL</label>
+          <input type="url" id="gasUrlInput" placeholder="https://script.google.com/macros/s/.../exec">
+          <small>Leave blank to operate in local simulated Demo Mode.</small>
+        </div>
+
+        <div class="setup-steps-box">
+          <h4>Quick 2-Minute Setup:</h4>
+          <ol>
+            <li>Go to <a href="https://script.google.com" target="_blank" rel="noopener">script.google.com</a> and click
+              <strong>New Project</strong>.
+            </li>
+            <li>Paste the contents of <code>Code.gs</code> (provided in this repo).</li>
+            <li>Verify your Folder ID is set to <code>14WS4NJJ8FXO1-kp0lZWNj6q5icgT79ds</code>.</li>
+            <li>Click <strong>Deploy &gt; New deployment</strong>.</li>
+            <li>Select type <strong>Web app</strong>, set <em>Execute as: Me</em> and <em>Who has access: Anyone</em>.
+            </li>
+            <li>Copy the Web App URL and paste it above!</li>
+          </ol>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="testConnectionBtn" class="btn-secondary">Test Connection</button>
+        <button id="saveSettingsBtn" class="btn-primary">Save Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="toast hidden">Message</div>
+
+  <footer class="app-footer">
+    <p>DropBin • By Sourav Gope (TheSerphh)</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+
+</html>

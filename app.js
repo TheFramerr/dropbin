@@ -7,7 +7,7 @@
 // ==========================================
 // CONFIGURATION (Hardcoded backend URL)
 // ==========================================
-const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzSzmoLXEOuM3d59HHGcohVoJCnu_avab4sblMM551M1UBBxRLr7eeo4X75IcF9inF_Qg/exec";
+const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzAO5gMsNA3hcTt4pCZmORju3e66oxQ-2hEVxB86ND0Qcx15u1AxOvMl7VRRrFV1Ot3/exec";
 const ADMIN_GITHUB_USER = "theframerr";
 const STORAGE_KEY_ADMIN_TOKEN = "dropbin_gh_admin_token";
 
